@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 class QTable:
-    def __init__(self, actions, learning_rate=0.01, gamma=0.9, e_greedy=0.9):
+    def __init__(self, actions, learning_rate=0.01, gamma=0.9, e_greedy=0.95):
         self.actions = actions
         self.learning_rate = learning_rate
         self.gamma = gamma
@@ -9,13 +9,14 @@ class QTable:
         self.q_table = pd.DataFrame(columns=actions, dtype=float)
     
     def choose_best_action(self, state):
-        #TODO:  add e-greedy
         self.check_state_exist(state)
-        # * choose best action: a = argmax(Q(s,a))
         all_actions = self.q_table.loc[state]
-        best_actions = all_actions[all_actions == all_actions.max()].index
-        action = np.random.choice(best_actions)
-
+        if np.random.uniform() < self.e_greedy:
+            # * choose best action: a = argmax(Q(s,a))
+            best_actions = all_actions[all_actions == all_actions.max()].index
+            action = np.random.choice(best_actions)
+        else:
+            action = np.random.choice(all_actions.index)
         return action
 
     def update_value(self, s1, a, r, s2):
