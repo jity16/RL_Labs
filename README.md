@@ -1,1 +1,1 @@
-# Maze_Q_Learning
+Lab1: Simple maze Q-learning
