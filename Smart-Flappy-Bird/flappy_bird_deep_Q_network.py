@@ -183,7 +183,10 @@ def test(model):
     # ? why four frames
     state = torch.cat((image_data, image_data, image_data, image_data)).unsqueeze(0)
 
+    befor_score = 0
+    current_score = 0
     while True:
+        befor_score = game_state.score
         # get output from the neural network
         output = model(state)[0]
 
@@ -197,26 +200,32 @@ def test(model):
             action_index = action_index.cuda()
         action[action_index] = 1
 
+
         image_data_1, reward, terminal = game_state.frame_step(action)
         image_data_1 = resize_and_bgr2gray(image_data_1)
         image_data_1 = image_to_tensor(image_data_1)
         state_1 = torch.cat((state.squeeze(0)[1:, :, :], image_data_1)).unsqueeze(0)
 
         state = state_1
+        current_score = game_state.score
+        if (befor_score != 0) and (current_score == 0):
+            print("best score: ", befor_score)
 
 
 def main(mode):
     if mode == 'test':
         if torch.cuda.is_available():
-            model = torch.load('pretrained_model/current_model_2000000.pth').eval()
+            model = torch.load('authors_pretrained_model/current_model_100000.pth').eval()
+            # model = torch.load('pretrained_model/current_model_200000.pth').eval()
         else:
-            model = torch.load('pretrained_model/current_model_2000000.pth', map_location='cpu').eval()
+            model = torch.load('authors_pretrained_model/current_model_200000.pth', map_location='cpu').eval()
+            # model = torch.load('pretrained_model/current_model_200000.pth', map_location='cpu').eval()
         if torch.cuda.is_available():
             model = model.cuda()
         test(model)
     elif mode == 'train':
-        if not os.path.exists('pretrained_model/'):
-            os.mkdir('pretrained_model/')
+        if not os.path.exists('authors_pretrained_model/'):
+            os.mkdir('authors_pretrained_model/')
         model = NeuralNetwork()
         if torch.cuda.is_available():
             model = model.cuda()
@@ -226,4 +235,4 @@ def main(mode):
 
 
 if __name__ == "__main__":
-    main('train')
+    main('test')

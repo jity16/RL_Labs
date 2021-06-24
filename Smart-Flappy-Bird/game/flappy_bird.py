@@ -79,7 +79,7 @@ def getHitmask(image):
     return mask
 
 
-FPS = 30 #30
+FPS = 300 #30
 SCREENWIDTH  = 288
 SCREENHEIGHT = 512
 

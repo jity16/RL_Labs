@@ -23,7 +23,7 @@ class NeuralNetwork(nn.Module):
         self.gamma = 0.99
         self.final_epsilon = 0.0001
         self.initial_epsilon = 0.1
-        self.number_of_iterations = 2000000
+        self.number_of_iterations = 200000000
         self.replay_memory_size = 10000
         self.minibatch_size = 32
 
@@ -179,8 +179,11 @@ def test(model):
     # ? why four frames
     state = torch.cat((image_data, image_data, image_data, image_data)).unsqueeze(0)
 
+    before_score = 0
+    current_score = 0
     while True:
         # get output from the neural network
+        before_score = game_state.score
         output = model(state)[0]
 
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)
@@ -199,7 +202,9 @@ def test(model):
         state_1 = torch.cat((state.squeeze(0)[1:, :, :], image_data_1)).unsqueeze(0)
 
         state = state_1
-
+        current_score = game_state.score
+        if (before_score != 0) and (current_score == 0):
+            print("best score :", before_score)
 
 def main(mode):
     if mode == 'test':
@@ -222,4 +227,4 @@ def main(mode):
 
 
 if __name__ == "__main__":
-    main('train')
+    main('test')
