@@ -180,6 +180,7 @@ def test(model):
     image_data, reward, terminal = game_state.frame_step(action)
     image_data = resize_and_bgr2gray(image_data)
     image_data = image_to_tensor(image_data)
+    print(image_data.shape)
     # ? why four frames
     state = torch.cat((image_data, image_data, image_data, image_data)).unsqueeze(0)
 

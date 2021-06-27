@@ -85,6 +85,7 @@ def train(model, start):
     image_data, reward, terminal = game_state.frame_step(action)
     image_data = resize_and_bgr2gray(image_data)
     image_data = image_to_tensor(image_data)
+    print(image_dat)
     state = torch.cat((image_data, image_data, image_data, image_data)).unsqueeze(0)
 
     epsilon = model.initial_epsilon
@@ -227,4 +228,4 @@ def main(mode):
 
 
 if __name__ == "__main__":
-    main('test')
+    main('train')
