@@ -10,4 +10,9 @@ def get_arguments():
     parser.add_argument('--env', default='CartPole-v1', help="Gym environments")
 
     # networks hyper parameters:
+
+
+
+    parser.add_argument('--niter', type=int, help='number of iterations', default=2e6)
     
+
