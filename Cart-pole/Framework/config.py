@@ -18,6 +18,8 @@ def get_arguments():
 
 
     # optimization hyper parameters:
-    parser.add_argument('--niters', type=int, help='number of iterations', default=2)
+    parser.add_argument('--niters', type=int, help='number of iterations', default=20)
+    parser.add_argument('--eps_start', type = float, help='initial epsilon', default=0.9)
+    parser.add_argument('--eps_end', type=float, help='final epsilon', default=0.05)
 
     return parser

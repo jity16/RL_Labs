@@ -3,8 +3,10 @@ import torch
 import torch.nn as nn
 
 def weights_init(m):
-    if type(m) == nn.Conv2d or type(m) == nn.Linear:
-        torch.nn.init.uniform(m.weight, -0.01, 0.01)
+    if type(m) == nn.Conv2d:
+        m.weight.data.normal_(0.0, 0.02)
+    elif type(m) == nn.Linear:
+        m.weight.data.normal_(1.0, 0.02)
         m.bias.data.fill_(0.01)
    
 # TODO: Class conv_blocks
@@ -16,7 +18,7 @@ class DQN(nn.Module):
         self.body = nn.Sequential(OrderedDict([
             ('conv1', nn.Conv2d(4, 16, 8, 4)),
             ('relu1', nn.ReLU(inplace=True)),
-            ('conv2', nn.conv2d(16, 32, 4, 2)),
+            ('conv2', nn.Conv2d(16, 32, 4, 2)),
             ('relu2', nn.ReLU(inplace=True))
         ]))
         self.tail = nn.Sequential(OrderedDict([
@@ -27,5 +29,6 @@ class DQN(nn.Module):
         
     def forward(self, x):
         x = self.body(x)
+        x = x.view(x.size()[0], -1)
         x = self.tail(x)
         return x

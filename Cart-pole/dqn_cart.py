@@ -103,7 +103,8 @@ def train(model, start):
     # state = torch
     # state[:::] = observation
     state = torch.cat((state_single_frame, state_single_frame, state_single_frame, state_single_frame)).unsqueeze(0)
-
+    # print(state.shape)
+    # exit()
     epsilon = model.initial_epsilon
     iteration = 0
 
@@ -111,6 +112,8 @@ def train(model, start):
 
     while iteration < model.number_of_iterations:
         output = model(state)[0]
+        # print(output.shape)
+        # exit()
 
         action = torch.zeros([model.number_of_actions], dtype=torch.float32)
         if torch.cuda.is_available():
