@@ -9,6 +9,10 @@ import torch
 import torch.optim as optim
 from itertools import count
 import numpy as np
+from collections import namedtuple, deque
+
+Transition = namedtuple('Transition',
+                        ('state', 'action', 'next_state', 'reward'))
 
 def init_models(opt):
     net = nn.DQN(opt)
@@ -31,7 +35,41 @@ def obv2state(state, observation):
     state = torch.cat((state.squeeze(0)[1:,:,:], single_state)).unsqueeze(0)
     return state
 
+def update_model(opt, memory, dqn, optimizer):
+    if len(memory) < opt.batch_size:
+        return
+    transitions = memory.sample(opt.batch_size)
+    batch = Transition(*zip(*transitions))
+    non_final_mask = torch.tensor(tuple(map(lambda s: s is not None,
+                                          batch.next_state)), device=opt.device, dtype=torch.bool)
+    non_final_next_states = torch.cat([s for s in batch.next_state
+                                                if s is not None])
+    state_batch = torch.cat(batch.state)
+    # action_batch = torch.cat(batch.action)
+    action_batch = torch.tensor(batch.action)
+    # reward_batch = torch.cat(batch.reward)
+    reward_batch = torch.tensor(batch.reward)
 
+    # print(dqn(state_batch).shape)
+    # exit()
+    # print(action_batch.shape)
+    # exit()
+    state_action_values = dqn(state_batch).gather(0,action_batch)
+    next_state_values = torch.zeros(opt.batch_size, device=opt.device)
+    next_state_values[non_final_mask] = dqn(non_final_next_states).max(1)[0].detach()
+
+    expected_state_action_values = (next_state_values * opt.gamma) + reward_batch
+    
+    # Compute Huber loss
+    criterion = nn.SmoothL1Loss()
+    loss = criterion(state_action_values, expected_state_action_values.unsqueeze(1))
+
+    # Optimize the model
+    optimizer.zero_grad()
+    loss.backward()
+    for param in dqn.parameters():
+        param.grad.data.clamp_(-1, 1)
+    optimizer.step()
 
 def train(opt):
     env = gym.make(opt.env)
@@ -74,6 +112,7 @@ def train(opt):
             state = next_state
 
             # TODO: update 
+            update_model(opt, replay_memory, dqn, optimizer)
 
             if done:
                 env.reset()

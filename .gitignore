@@ -1,3 +1,4 @@
 ./.vscode
-./Cart-pole/model
-./Smart-Flappy-Bird/*pretrained_model
+./Cart-pole/Framework/TrainedModel/*
+./Cart-pole/model/*
+./Smart-Flappy-Bird/*pretrained_model/*
